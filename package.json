@@ -1,0 +1,19 @@
+{
+  "name": "arastat-gui",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "devDependencies": {
+    "eslint": "9.39.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "serialport": "^13.0.0"
+  }
+}
