@@ -1,15 +1,28 @@
 const { error } = require('node:console');
 const {SerialPort} = require('serialport')
+const express = require('express')
 const { DelimiterParser } = require('@serialport/parser-delimiter');
 
-const app = require('./app').default;
-const server = app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
-});
 
-server.on('error', (err) => {
-    console.error('Server error:', err);
-});
+const app = express();
+const backendPort = 3000;
+
+app.get("/",(req,res)=>{
+    console.log("hello");
+    res.sendStatus(200);
+})
+
+app.post("/set",(req,res)=>{
+    console.log("post accepted");
+    console.log(req.body);
+    // console.log(req);
+    res.send({"message":"lovely!"});
+    // res.sendStatus(200);
+})
+
+app.listen(backendPort,()=>{
+    console.log("listening..");
+})
 const port = new SerialPort({path:'/dev/ttyACM0', baudRate:115200},(err)=>{
     if (err) return console.log("error",err.message);
     else console.log("connected");
