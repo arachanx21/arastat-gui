@@ -4,18 +4,21 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"nodemon index.js"
+    "dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
   "keywords": [],
   "description": "",
   "devDependencies": {
-    "eslint": "9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
     "nodemon": "^3.1.11"
   },
   "dependencies": {
+    "body-parser": "^2.2.1",
     "express": "^5.2.1",
-    "serialport": "^13.0.0"
+    "serialport": "^13.0.0",
+    "socket.io": "^4.8.3"
   }
 }
