@@ -8,6 +8,7 @@
     <script src="jquery.js"></script>
 	<script src="plotly-3.3.0.min.js" charset="utf-8"></script>
     <script src="socket.io.js"></script>
+    <script src="script.js"></script>
 
 </head>
 <body>
@@ -37,94 +38,99 @@
         <main id="overview">
             <section class="hero" aria-labelledby="hero-title">
                 <div>
-                    <h1 id="hero-title">Single Page Dashboard Layout</h1>
-                    <p>Clean, responsive, and lightweight starter layout you can extend for admin panels, landing pages, or apps.</p>
+                    <h1 id="hero-title">Mission Control</h1>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
                     <div style="font-size:12px;color:var(--muted)">Status</div>
-                    <div class="card" style="padding:8px 12px;border-radius:999px;min-width:120px;text-align:center;font-weight:700;background:linear-gradient(90deg,#052d4b,#073b6b)">Active</div>
+                    <div class="card" style="padding:8px 12px;border-radius:999px;min-width:120px;text-align:center;font-weight:700;background:linear-gradient(90deg,#052d4b,#073b6b)">
+                        <p id="status">idle</p>
+                    </div>
                 </div>
             </section>
 
             <section class="grid" aria-label="Quick cards">
                 <div class="card">
-                    <h3>Users</h3>
-                    <p>1,245 active users this week</p>
+                    <h3>DAC Value</h3>
+                    <h4 id="DAC">---</h4>
                 </div>
                 <div class="card">
-                    <h3>Revenue</h3>
-                    <p>$24,800 total — up 8% from last period</p>
+                    <h3>Voltage</h3>
+                    <h4 id="volt">---</h4>
                 </div>
                 <div class="card">
-                    <h3>Latency</h3>
-                    <p>Average response 180ms</p>
+                    <h3>curr</h3>
+                    <h4 id="curr">---</h4>
                 </div>
             </section>
-
+            <div style="display:flex;justify-content:center;">
+                <button id="checkV">Check Voltage</button>
+            </div>
             <section style="margin-top:14px;" class="bottom">
                 <div style="display:grid;gap:12px">
                     <div class="card">
-                        <h3>Activity Feed</h3>
-                        <p class="muted" style="color:var(--muted)">Recent events and logs will appear here.</p>
-                    </div>
-                    <div class="card">
-                        <h3>Details</h3>
-                        <p style="color:var(--muted)">Use this area to show charts, tables, or detailed content. It's intentionally minimal so you can replace with your components.</p>
+                        <h3>Plot</h3>
                     </div>
                 </div>
                 <div id="tester" style="width:800px;height:600px;"></div>
                 <script>
-                $(document).ready(()=>{
-                    const socket = io();
-                    let num = 0;
-                    socket.on("data",(packet)=>{
-                        Plotly.extendTraces('tester',{x:[[packet.dac/4095*3300-1650]],y:[[(packet.curr-1650)/-1000]]},[0])
-                        console.log(packet); 
-                    })
-                    // var test = $("#tester");
-                    var test = document.getElementById("tester");
-                    Plotly.newPlot( test, [{
-                        x: [],
-                        y: [] }], {
-                            margin: { t: 0 },
-                        } );
                 
-                    $("#clearBtn").click((e)=>{
-                        console.log("clicked");
-                        Plotly.newPlot( test, [{
-                        x: [],
-                        y: [] }], {
-                            margin: { t: 0 },
-                        } );
-                    })
-                })
                     
                 </script>
+                <span>
                 <button id="clearBtn">Clear</button>
+                </span>
+                <span>
+                <button id="startMeasurement">Start Measurement</button>
+                </span>
             </section>
         </main>
 
         <aside>
             <div class="panel" aria-labelledby="panel-title">
                 <h4 id="panel-title">Parameter Settings</h4>
+                
                 <div class="list" role="list">
                     <form>
-                        <div class="item" role="listitem">
+                        <div class="card">
                             <h4>Mode</h4>
-                            
+                            <select id="mode">
+                                <option value="1">Linear Sweep Voltammetry</option>
+                                <option value="2">Cyclic Voltammetry</option>
+                            </select>
                         </div>
+                        <div class="card">
+                            <h4>Starting Volttage(mV)</h4>
+                            <input id="startingVoltage" required="true" value="-600" min="-1650" max="1650" type="text">
+                        </div>
+                        <div class="card">
+                            <h4>Final Volttage(mV)</h4>
+                            <input id="finalVoltage" required="true" value="600" min="-1650" max="1650" type="text">
+                        </div>
+                        <div class="card">
+                            <h4>Scan Rate(mV/s)</h4>
+                            <select id="scanRate">
+                                <option value="10" >10</option>
+                                <option value="25" >25</option>
+                                <option value="50" >50</option>
+                                <option value="100">100</option>
+                                <option value="250">250</option>
+                                <option value="500">500</option>
+                            </select>
+                        </div>
+                        <input type="submit" value="Submit" id="formSubmission"/>
                     </form>
-                    <!-- <div class="item" role="listitem"><span>Deploy</span><button class="btn" style="padding:6px 8px">Go</button></div>
-                    <div class="item" role="listitem"><span>Invite team</span><button class="btn" style="padding:6px 8px">Invite</button></div>
-                    <div class="item" role="listitem"><span>Integrations</span><button class="btn" style="padding:6px 8px">Open</button></div> -->
                 </div>
             </div>
 
             <div style="height:12px"></div>
 
             <div class="panel">
-                <h4>Notes</h4>
-                <p style="color:var(--muted);font-size:14px;margin:8px 0 0">Short reminders, tips, or status messages can live here.</p>
+                <h4>Device Setting</h4>
+                <div class="card">
+                    <h3>Open Circuit Potential</h3>
+                    <h4 id="OCP">---</h4>
+                </div>
+                <button id="getOCP">get OCP</button>
             </div>
         </aside>
 

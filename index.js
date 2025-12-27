@@ -5,6 +5,7 @@ const express = require('express')
 const { DelimiterParser } = require('@serialport/parser-delimiter');
 const bodyParser = require('body-parser');
 const path = require('path');
+const { stat } = require('node:fs');
 
 
 const ARASTAT_MODES = {
@@ -58,6 +59,11 @@ app.post("/data",(req,res)=>{
 app.post("/cmd",(req,res)=>{
     console.log("command accepted");
     console.log(req.body)
+    commandHandler(req.body).then(()=>{
+        res.send({"message":"cmd sent"});
+    }).catch((err)=>{
+        console.log("Err",err);
+    })
 })
 
 app.post("/save",(req,res)=>{
@@ -121,17 +127,28 @@ parser.on('data', function (data) {
         expData.volt=[];
     }
     else console.log("stop");
-    if (state.running) state.collect = true;
+    if (state.running) {
+        state.collect = true;
+        io.emit("status",{"status":"Running"});
+    }
     else {
         state.collect = false;
+        io.emit("status",{"status":"Idle"});
     }
 }
-  if (text.includes("{") && state.collect){
+  if (text.includes("{")){
     let a = JSON.parse(text);
+    if (state.collect)
+    {
     expData.dac.push(a.dac);
     expData.volt.push(a.volt);
     expData.curr.push(a.curr);
     io.emit("data",a);
+    }
+    else {
+        console.log(a);
+        io.emit("ocp",a);
+    }
   }
   parser.resume();
 })
@@ -155,6 +172,15 @@ async function settingHandler(body,cb){
     })
 }
 
+async function commandHandler(body) {
+    let buffer = "";
+    buffer += "/"+body.mode+"//";
+    port.write(buffer,'utf-8',(err)=>{
+        if (err) throw new Error("failed to write");
+        else return 1;
+    })
+    
+}
 const writeJSONFile = ()=>{
         let result = 0;
         const date = new Date().getTime();
