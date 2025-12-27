@@ -159,11 +159,19 @@ async function settingHandler(body,cb){
     let buffer = "";
     const mode = ARASTAT_MODES[body.mode];
     // console.log(mode);
-    if (mode>0 && mode<4) 
+    if (mode>0 && mode<4){
+
         buffer += mode.toString()+"/";
         buffer += body.startingVoltage+"/";
         buffer += body.finalVoltage+"/";
         buffer += body.scanRate+"//";
+    }
+    else{
+        Object.keys(body).forEach((key)=>{
+        buffer += body[key]+"/";
+        })
+        buffer+="/";
+    }
     console.log(buffer);
     
     await port.write(buffer,'utf-8',(err)=>{
@@ -173,9 +181,13 @@ async function settingHandler(body,cb){
 }
 
 async function commandHandler(body) {
-    let buffer = "";
-    buffer += "/"+body.mode+"//";
-    port.write(buffer,'utf-8',(err)=>{
+    let buffer = "/";
+    Object.keys(body).forEach((key)=>{
+        buffer += body[key]+"/";
+    })
+    buffer+="/";
+    console.log(buffer);
+    await port.write(buffer,'utf-8',(err)=>{
         if (err) throw new Error("failed to write");
         else return 1;
     })

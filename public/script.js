@@ -100,6 +100,20 @@ $("#startMeasurement").click((e)=>{
     })
 
     $("#OCP").text(refVoltage);
+
+    $("#setOCP").click((e)=>{
+        let val = parseInt($("#curr").text());
+        if (isNaN(val)){
+            console.log("empty");
+            alert("Check the voltage first");
+        }
+        else {
+            console.log(val)
+            refVoltage=val;
+            $("#OCP").text(refVoltage);
+            alert("OCP is set :)");
+        };      
+    })
 })
 
 
