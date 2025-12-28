@@ -36,10 +36,14 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname,'public')));
 
 app.get("/",(req,res)=>{
-    console.log("hello");
+    // console.log("hello");
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
     // res.render('index.html')
 
+})
+
+app.get("/setting",(req,res)=>{
+    res.sendFile(path.join(__dirname, 'public', 'conf.html'));
 })
 
 app.post("/set",(req,res)=>{
@@ -107,6 +111,13 @@ port.write('2/-600/600/10//', function(err) {
   }
   console.log('message written')
 })
+
+setTimeout(()=>{
+        port.write("6/-300//",(err)=>{
+            if (err) console.log("Error, ",err.message);
+            else console.log("completed");
+        });
+    },500);
 
 const parser = port.pipe(new DelimiterParser({ delimiter: '\n' }))
 
@@ -187,7 +198,7 @@ async function commandHandler(body) {
     })
     buffer+="/";
     console.log(buffer);
-    await port.write(buffer,'utf-8',(err)=>{
+    port.write(buffer,'utf-8',(err)=>{
         if (err) throw new Error("failed to write");
         else return 1;
     })
