@@ -239,7 +239,7 @@ $("#startMeasurement").click((e)=>{
             url: '/save',
             type: 'POST',
             contentType: 'application/json', // Set the Content-Type header
-            data: JSON.stringify(data), // Stringify the data
+            data: JSON.stringify({}), // Stringify the data
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
