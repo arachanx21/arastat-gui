@@ -1,13 +1,13 @@
 $(document).ready(()=>{
-// Prevent accidental print dialog during debugging and log call stack
-if (typeof window !== 'undefined') {
-    const _origPrint = window.print;
-    window.print = function(...args) {
-        console.warn('window.print called', ...args);
-        console.trace();
-        // do not call original to avoid opening print dialog
-    };
-}
+// // Prevent accidental print dialog during debugging and log call stack
+// if (typeof window !== 'undefined') {
+//     const _origPrint = window.print;
+//     window.print = function(...args) {
+//         console.warn('window.print called', ...args);
+//         console.trace();
+//         // do not call original to avoid opening print dialog
+//     };
+// }
 const socket = io();
 let num = 0;
 let isupdating = false;
@@ -17,7 +17,8 @@ let RTIA = 1000;
 let isSubmitting = false;
 
 socket.on("data",(packet)=>{
-    Plotly.extendTraces('tester',{x:[[packet.dac/4095*3300-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
+    Plotly.extendTraces('tester',{x:[[parscket.dac/4095*3300-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
+    // Plotly.extendTraces('tester',{x:[[packet.volt-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
     console.log(packet); 
 })
 
@@ -86,7 +87,7 @@ $("#checkV").click((e)=>{
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
-                isupdating = true;
+                isupdating = false;
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
@@ -104,6 +105,7 @@ $("#startMeasurement").click((e)=>{
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
+                alert("Measurement Started!");
                 isRunning=true;
             },
             error: function(xhr, status, error) {
@@ -230,6 +232,22 @@ $("#startMeasurement").click((e)=>{
             console.log(val)
             refVoltage=val;
             $("#OCP").text(refVoltage);
+            $.ajax({
+            url: '/setOCP',
+            type: 'POST',
+            contentType: 'application/json', // Set the Content-Type header
+            data: JSON.stringify({"OCPVal":val}), // Stringify the data
+            dataType: 'json', // The type of data you expect back
+            success: function(response) {
+                console.log('Success:', response);
+                alert("OCP Val Saved!");
+                return;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                isSubmitting=false;
+                return;
+            }});
             alert("OCP is set :)");
         };      
     })
@@ -254,6 +272,27 @@ $("#startMeasurement").click((e)=>{
                 return;
             }});
     })
+
+    // setInterval(()=>{
+    //     $.ajax({
+    //         url: '/status',
+    //         type: 'POST',
+    //         contentType: 'application/json', // Set the Content-Type header
+    //         data: JSON.stringify({}), // Stringify the data
+    //         dataType: 'json', // The type of data you expect back
+    //         success: function(response) {
+    //             console.log('Success:', response);
+    //             isRunning=true;
+    //             isSubmitting=false;
+    //             alert("Measurement Saved!");
+    //             return;
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error('Error:', error);
+    //             isSubmitting=false;
+    //             return;
+    //         }});
+    // },1000);
 })
 
 

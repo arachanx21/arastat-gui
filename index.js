@@ -23,7 +23,15 @@ let state = {
     collect:false,
 }
 
-let expData = {"dac":[],
+let expData = {
+    'startingVoltage':NaN,
+    'finalVoltage':NaN,
+    'scanRate':NaN,
+    'OCPVal':NaN,
+    'quietTime':0,
+    'idleVoltage':NaN,
+    "mode":NaN,
+    "dac":[],
     "curr":[],
     "volt":[]
 };
@@ -56,7 +64,7 @@ app.post("/set",(req,res)=>{
     });
 })
 
-app.post("/data",(req,res)=>{
+app.post("/getData",(req,res)=>{
     res.send(expData);
 })
 
@@ -81,6 +89,11 @@ app.post("/save",(req,res)=>{
             res.send(400);    
         });
     }
+})
+
+app.post('/status',(req,res)=>{
+    if (state.running) io.emit("status",{"status":"Running"});
+    else io.emit("status",{"status":"Idle"});
 })
 
 // app.listen(backendPort,()=>{
@@ -109,13 +122,22 @@ port.write('2/-600/600/10//', function(err) {
   if (err) {
     return console.log('Error on write: ', err.message)
   }
-  console.log('message written')
+  else{
+    expData['mode']=2;
+    expData['startingVoltage']=-600;
+    expData['finalVoltage']=600;
+    expData['scanRate']=10;
+    console.log('message written');
+    }
 })
 
 setTimeout(()=>{
         port.write("6/-300//",(err)=>{
             if (err) console.log("Error, ",err.message);
-            else console.log("completed");
+            else {
+                expData['idleVoltage']=-300;
+                console.log("completed");
+            }
         });
     },500);
 
@@ -179,6 +201,7 @@ async function settingHandler(body,cb){
     }
     else{
         Object.keys(body).forEach((key)=>{
+        if (Object.keys(expData).includes(key)) expData[key]=body[key];
         buffer += body[key]+"/";
         })
         buffer+="/";
@@ -194,6 +217,7 @@ async function settingHandler(body,cb){
 async function commandHandler(body) {
     let buffer = "/";
     Object.keys(body).forEach((key)=>{
+        if (Object.keys(expData).includes(key)) expData[key]=body[key];
         buffer += body[key]+"/";
     })
     buffer+="/";
