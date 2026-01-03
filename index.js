@@ -54,6 +54,10 @@ app.get("/setting",(req,res)=>{
     res.sendFile(path.join(__dirname, 'public', 'conf.html'));
 })
 
+app.get("/view",(req,res)=>{
+    res.sendFile(path.join(__dirname, 'public', 'viewer.html'));
+})
+
 app.post("/set",(req,res)=>{
     console.log("post accepted");
     console.log(req.body);
@@ -95,6 +99,19 @@ app.post('/setName',(req,res)=>{
     console.log("saving the name");
     expData["name"]=req.name;
     res.send(200);
+})
+
+app.post('/getName',(req,res)=>{
+    const dir = path.join(__dirname,"data");
+    console.log(dir);
+    console.log(req.body);
+    fs.readFile(`${dir}/${req.body.name}.json`,'utf-8',(err,data)=>{
+        if (err) {
+            console.log(err);
+            res.send(400);}
+        else res.send(data);
+    })
+
 })
 
 app.post('/status',(req,res)=>{

@@ -322,8 +322,6 @@ $("#startMeasurement").click((e)=>{
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
-                isRunning=true;
-                isSubmitting=false;
                 alert("Name Saved!");
                 return;
             },
@@ -333,6 +331,47 @@ $("#startMeasurement").click((e)=>{
                 return;
             }});
     })
+
+    $("#getName").click((e)=>{
+        const data = {"name":$("#name").val()}
+        $.ajax({
+            url: '/getName',
+            type: 'POST',
+            contentType: 'application/json', // Set the Content-Type header
+            data: JSON.stringify(data), // Stringify the data
+            dataType: 'json', // The type of data you expect back
+            success: function(response) {
+                console.log('Success:', response);
+                let x_dac = response.dac.map((x)=>x/4095*3300-refVoltage );
+                let x_volt = response.volt.map((x)=>x - refVoltage);
+                let curr = response.curr.map((y)=>(y - refVoltage)/-RTIA);
+                const data = [x_dac,curr];
+                const data2 = [x_volt,curr];
+                console.log(data);
+                Plotly.newPlot(test ,[{x:x_dac,y:curr}] ,layout);
+                Plotly.newPlot(test2,[{x:x_volt,y:curr}],layout);
+                return;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                return;
+            }});
+    })
+
+
+    $("#setOCPVal").click(()=>{
+        let val = parseInt($("#OCPVal").val());
+        if (isNaN(val)){
+            console.log("empty");
+            alert("Check the voltage first");
+        }
+        else {
+            console.log(val)
+            refVoltage=val;
+            $("#OCP").text(refVoltage);
+        }
+    })
+    
 
     // setInterval(()=>{
     //     $.ajax({
