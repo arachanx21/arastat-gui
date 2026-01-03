@@ -11,14 +11,14 @@ $(document).ready(()=>{
 const socket = io();
 let num = 0;
 let isupdating = false;
-let isRunning = false;
+let isRunning = false;  
 let refVoltage = 1650;
 let RTIA = 1000;
 let isSubmitting = false;
 
 socket.on("data",(packet)=>{
-    Plotly.extendTraces('tester',{x:[[parscket.dac/4095*3300-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
-    // Plotly.extendTraces('tester',{x:[[packet.volt-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
+    Plotly.extendTraces('tester',{x:[[packet.dac/4095*3300-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
+    Plotly.extendTraces('tester_',{x:[[packet.volt-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
     console.log(packet); 
 })
 
@@ -47,6 +47,7 @@ socket.on("status",(packet)=>{
 
 // var test = $("#tester");
 var test = document.getElementById("tester");
+var test2 = document.getElementById("tester_");
 const layout = {
         margin: { t: 0 },
         xaxis: {
@@ -70,9 +71,15 @@ const layout = {
 Plotly.newPlot( test, [{
     x: [],
     y: [] }], layout );
+Plotly.newPlot( test2, [{
+    x: [],
+    y: [] }], layout );
 $("#clearBtn").click((e)=>{
     console.log("clicked");
     Plotly.newPlot( test, [{
+    x: [],
+    y: [] }], layout );
+    Plotly.newPlot( test2, [{
     x: [],
     y: [] }], layout );
 })
@@ -214,6 +221,8 @@ $("#startMeasurement").click((e)=>{
             }});
         }
     })
+
+    
     
     $("#formSubmission").click((e)=>{
         e.preventDefault();
@@ -251,6 +260,36 @@ $("#startMeasurement").click((e)=>{
             alert("OCP is set :)");
         };      
     })
+    $("#setInitialVoltage").click((e)=>{
+        let val = parseInt($("#initialVoltage").text());
+        if (isNaN(val)){
+            console.log("empty");
+            alert("Check the voltage first");
+        }
+        else {
+            console.log(val)
+            initVoltage=val;
+            $("#OCP").text(initVoltage);
+            $.ajax({
+            url: '/set',
+            type: 'POST',
+            contentType: 'application/json', // Set the Content-Type header
+            data: JSON.stringify({"mode":9,
+                                  "initVoltage":val}), // Stringify the data
+            dataType: 'json', // The type of data you expect back
+            success: function(response) {
+                console.log('Success:', response);
+                alert("init Voltage set!");
+                return;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                isSubmitting=false;
+                return;
+            }});
+            alert("OCP is set :)");
+        };      
+    })
 
     $("#save").click((e)=>{
         $.ajax({
@@ -264,6 +303,28 @@ $("#startMeasurement").click((e)=>{
                 isRunning=true;
                 isSubmitting=false;
                 alert("Measurement Saved!");
+                return;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                isSubmitting=false;
+                return;
+            }});
+    })
+
+    $("#setName").click((e)=>{
+        const data = {"name":$("#name").text()}
+        $.ajax({
+            url: '/setName',
+            type: 'POST',
+            contentType: 'application/json', // Set the Content-Type header
+            data: JSON.stringify(data), // Stringify the data
+            dataType: 'json', // The type of data you expect back
+            success: function(response) {
+                console.log('Success:', response);
+                isRunning=true;
+                isSubmitting=false;
+                alert("Name Saved!");
                 return;
             },
             error: function(xhr, status, error) {

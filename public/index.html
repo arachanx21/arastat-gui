@@ -57,17 +57,36 @@
                     <h3>curr</h3>
                     <h4 id="curr">---</h4>
                 </div>
+                <div class="card">
+                    <h3>OCP</h3>
+                    <h4 id="OCP">---</h4>
+                </div>
             </section>
             <div style="display:flex;justify-content:center;">
                 <button id="checkV">Check Voltage</button>
+                <button id="setOCP">Set OCP</button>
+                <span>
+                    <button id="startMeasurement">Start Measurement</button>
+                </span>
+                <span>
+                    <button id="clearBtn">Clear</button>
+                </span>
+                <span>
+                    <button id="save">save</button>
+                </span>
             </div>
             <section style="margin-top:14px;" class="bottom">
                 <div style="display:grid;gap:12px">
                     <div class="card">
                         <h3>Plot</h3>
+                        <h4>DAC vs Current</h4>
                     </div>
                 </div>
                 <div id="tester" style="width:720;height:540px;"></div>
+                <div>
+                    <h4>V vs current</h4>
+                    <div id="tester_" style="width:720;height:540px;"></div>
+                </div>
             </section>
         </main>
 
@@ -110,34 +129,28 @@
                                 <input id="idleVoltage" required value="-600" min="-1650" max="1650" type="number">
                                 <input type="submit" value="Submit" id="setIdleVoltage"/>
                         </div>
-                         <div>
+                        <div class="card">
+                            <h4>Initial Voltage(mV)</h4>
+                            <input id="initialVoltage" required="true" value="-300" min="-1650" max="1650" type="text">
+                            <input type="submit" value="Submit" id="setInitialVoltage"/>
+                        </div>
+                         <div class="card">
                             <h4>Quiet Time(ms)</h4>
                             <input id="quietTime" required="true" value="1000" min="0" max="2000" type="text">
                             <input type="submit" value="Submit" id="setTime"/>
                         </div>
+                        <div class="card">
+                            <h4>Name</h4>
+                            <input id="name" required="true"type="text">
+                            <input type="submit" value="Submit" id="setName"/>
+                        </div>
+                        
                 </div>
             </div>
 
             <div style="height:12px"></div>
-
-            <div class="panel">
-                <h4>Device Setting</h4>
-                <div class="card">
-                    <h3>Open Circuit Potential</h3>
-                    <h4 id="OCP">---</h4>
-                </div>
-                <button id="setOCP">Set OCP</button>
-                <span>
-                    <button id="startMeasurement">Start Measurement</button>
-                </span>
-                <span>
-                    <button id="clearBtn">Clear</button>
-                </span>
-                <span>
-                    <button id="save">save</button>
-                </span>
-            </div>
         </aside>
+        
 
         <footer>
             <div>© <strong>Arastat GUI</strong> — Built with a minimal layout</div>

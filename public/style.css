@@ -79,10 +79,11 @@
         .grid{
             margin-top:18px;
             display:grid;
-            grid-template-columns: repeat(3,1fr);
+            grid-template-columns: repeat(4,1fr);
             gap:12px;
         }
         .card{
+            /* width: 20%; */
             background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
             padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);
         }

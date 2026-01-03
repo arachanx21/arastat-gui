@@ -91,6 +91,12 @@ app.post("/save",(req,res)=>{
     }
 })
 
+app.post('/setName',(req,res)=>{
+    console.log("saving the name");
+    expData["name"]=req.name;
+    res.send(200);
+})
+
 app.post('/status',(req,res)=>{
     if (state.running) io.emit("status",{"status":"Running"});
     else io.emit("status",{"status":"Idle"});
@@ -209,6 +215,7 @@ async function settingHandler(body,cb){
     console.log(buffer);
     
     await port.write(buffer,'utf-8',(err)=>{
+        console.log(err);
         if (err) throw new Error("failed to write");
         else return 1;
     })
@@ -233,10 +240,11 @@ const writeJSONFile = ()=>{
         const date = new Date().getTime();
         const d = new Date(date);
         const pad = n => String(n).padStart(2,'0');
-        const formattedDate = `${pad(d.getDate())}${pad(d.getMonth()+1)}${String(d.getFullYear()).slice(-2)}${pad(d.getHours())}${pad(d.getMinutes())}`;
+        const formattedDate = `${pad(d.getDate())}${pad(d.getMonth()+1)}${String(d.getFullYear()).slice(-2)}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        const dir = path.join(__dirname,'data');
         if (expData.curr.length==0) result=0;
         else result=1;
-        fs.writeFile(`${formattedDate}.json`,JSON.stringify(expData),'utf-8',(err)=>{
+        fs.writeFile(`${dir}/${formattedDate}.json`,JSON.stringify(expData),'utf-8',(err)=>{
             if (err) console.log("error");
             else console.log("filec reated");
         })
