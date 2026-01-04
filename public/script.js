@@ -77,6 +77,7 @@ Plotly.newPlot( test2, [{
     y: [] }], layout );
 $("#clearBtn").click((e)=>{
     console.log("clicked");
+    plots = [];
     Plotly.newPlot( test, [{
     x: [],
     y: [] }], layout );
@@ -357,6 +358,7 @@ $("#startMeasurement").click((e)=>{
                     plots.push(name);
                 }
                 if (!isNaN(parseInt(response.OCPVal))) refVoltage = response.OCPVal;
+                if (!isNaN(parseInt(response.RTIA))) RTIA = response.RTIA;
                 let x_dac = response.dac.map((x)=>x/4095*3300-refVoltage );
                 let x_volt = response.volt.map((x)=>x - refVoltage);
                 let curr = response.curr.map((y)=>(y - refVoltage)/-RTIA);
@@ -413,6 +415,11 @@ const getNames = ()=>{
             }});
     
 }
+
+$("#setRTIA").click(()=>{
+    RTIA = $("#RTIA").val();
+
+})
 getNames();
     // setInterval(()=>{
     //     $.ajax({
