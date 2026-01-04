@@ -15,6 +15,7 @@ let isRunning = false;
 let refVoltage = 1650;
 let RTIA = 1000;
 let isSubmitting = false;
+let plots = [];
 
 socket.on("data",(packet)=>{
     Plotly.extendTraces('tester',{x:[[packet.dac/4095*3300-refVoltage]],y:[[(packet.curr-refVoltage)/-RTIA]]},[0])
@@ -333,23 +334,35 @@ $("#startMeasurement").click((e)=>{
     })
 
     $("#getName").click((e)=>{
-        const data = {"name":$("#name").val()}
+        const name = {"name":$("#name").val()}
         $.ajax({
             url: '/getName',
             type: 'POST',
             contentType: 'application/json', // Set the Content-Type header
-            data: JSON.stringify(data), // Stringify the data
+            data: JSON.stringify(name), // Stringify the data
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
+                if (plots.includes(name)){
+                    return;
+                }
+                else{
+                    plots.push(name);
+                }
                 let x_dac = response.dac.map((x)=>x/4095*3300-refVoltage );
                 let x_volt = response.volt.map((x)=>x - refVoltage);
                 let curr = response.curr.map((y)=>(y - refVoltage)/-RTIA);
                 const data = [x_dac,curr];
                 const data2 = [x_volt,curr];
                 console.log(data);
-                Plotly.newPlot(test ,[{x:x_dac,y:curr}] ,layout);
-                Plotly.newPlot(test2,[{x:x_volt,y:curr}],layout);
+                if (plots.length == 1){
+                    Plotly.newPlot(test ,[{x:x_dac,y:curr}] ,layout);
+                    Plotly.newPlot(test2,[{x:x_volt,y:curr}],layout);
+                }
+                else{
+                    Plotly.addTraces('tester' ,[{x:x_dac,y:curr}] );
+                    Plotly.addTraces('tester_',[{x:x_volt,y:curr}]);
+                }
                 return;
             },
             error: function(xhr, status, error) {

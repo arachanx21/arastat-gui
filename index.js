@@ -33,7 +33,8 @@ let expData = {
     "mode":NaN,
     "dac":[],
     "curr":[],
-    "volt":[]
+    "volt":[],
+    "name":''
 };
 
 const app = express();
@@ -72,6 +73,11 @@ app.post("/getData",(req,res)=>{
     res.send(expData);
 })
 
+app.post('/setOCP',(req,res)=>{
+    console.log(req.body);
+    expData["OCPVal"]=req.body.OCPVal;
+})
+
 app.post("/cmd",(req,res)=>{
     console.log("command accepted");
     console.log(req.body)
@@ -97,7 +103,7 @@ app.post("/save",(req,res)=>{
 
 app.post('/setName',(req,res)=>{
     console.log("saving the name");
-    expData["name"]=req.name;
+    expData["name"]=req.body.name;
     res.send(200);
 })
 
