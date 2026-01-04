@@ -125,6 +125,13 @@ app.post('/status',(req,res)=>{
     else io.emit("status",{"status":"Idle"});
 })
 
+app.post('/getNames',(req,res)=>{
+    const nameList = fs.readdir(path.join(__dirname,'data'),(err,data)=>{
+        console.log(data);
+        res.send(data);
+    })
+})
+
 // app.listen(backendPort,()=>{
 //     console.log(`http listening.. on port ${backendPort}`);
 // })

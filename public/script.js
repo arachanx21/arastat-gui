@@ -334,12 +334,19 @@ $("#startMeasurement").click((e)=>{
     })
 
     $("#getName").click((e)=>{
-        const name = {"name":$("#name").val()}
+        let name = $("#name").val()
+        const nameSelected = $("#nameLists").val()
+        if (name =='' && nameSelected == ''){
+            alert('please fill the name');
+            return;
+        }
+        if (name == '' && nameSelected != '') name = nameSelected;
+        console.log(name);
         $.ajax({
             url: '/getName',
             type: 'POST',
             contentType: 'application/json', // Set the Content-Type header
-            data: JSON.stringify(name), // Stringify the data
+            data: JSON.stringify({"name":name}), // Stringify the data
             dataType: 'json', // The type of data you expect back
             success: function(response) {
                 console.log('Success:', response);
@@ -349,6 +356,7 @@ $("#startMeasurement").click((e)=>{
                 else{
                     plots.push(name);
                 }
+                if (!isNaN(parseInt(response.OCPVal))) refVoltage = response.OCPVal;
                 let x_dac = response.dac.map((x)=>x/4095*3300-refVoltage );
                 let x_volt = response.volt.map((x)=>x - refVoltage);
                 let curr = response.curr.map((y)=>(y - refVoltage)/-RTIA);
@@ -385,7 +393,27 @@ $("#startMeasurement").click((e)=>{
         }
     })
     
-
+const getNames = ()=>{
+    $.ajax({
+            url: '/getNames',
+            type: 'POST',
+            contentType: 'application/json', // Set the Content-Type header
+            dataType: 'json', // The type of data you expect back
+            success: function(response) {
+                // console.log('Success:', response);
+                response.forEach((filename)=>{
+                    const fileName_ = filename.slice(0,-5);
+                    $("#nameLists").append(`<option value=${fileName_}>${fileName_}</option>`)
+                })
+                return;
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                return;
+            }});
+    
+}
+getNames();
     // setInterval(()=>{
     //     $.ajax({
     //         url: '/status',
