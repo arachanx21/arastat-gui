@@ -77,7 +77,7 @@ Plotly.newPlot( test2, [{
     y: [] }], layout );
 $("#clearBtn").click((e)=>{
     console.log("clicked");
-    plots = [];
+    plots=[];
     Plotly.newPlot( test, [{
     x: [],
     y: [] }], layout );
