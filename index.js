@@ -194,11 +194,13 @@ parser.on('data', function (data) {
         expData.curr=[];
         expData.dac=[];
         expData.volt=[];
+        expData.RunningDate = new Date().getTime();
     }
     else console.log("stop");
     if (state.running) {
         state.collect = true;
         io.emit("status",{"status":"Running"});
+        writeJSONFile();
     }
     else {
         state.collect = false;
