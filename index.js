@@ -6,6 +6,7 @@ const { DelimiterParser } = require('@serialport/parser-delimiter');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { stat } = require('node:fs');
+const { PassThrough } = require('node:stream');
 
 
 const ARASTAT_MODES = {
@@ -208,19 +209,24 @@ parser.on('data', function (data) {
     }
 }
   if (text.includes("{")){
-    let a = JSON.parse(text);
-    if (state.collect)
-    {
-    expData.dac.push(a.dac);
-    expData.volt.push(a.volt);
-    expData.curr.push(a.curr);
-    io.emit("data",a);
+    try{
+
+        let a = JSON.parse(text);
+        if (state.collect)
+            {
+                expData.dac.push(a.dac);
+                expData.volt.push(a.volt);
+                expData.curr.push(a.curr);
+                io.emit("data",a);
+            }
+            else {
+                state.collect=true;
+                console.log(a);
+                io.emit("ocp",a);
+            }
+        }
+    catch (Error){ }
     }
-    else {
-        console.log(a);
-        io.emit("ocp",a);
-    }
-  }
   parser.resume();
 })
 
@@ -261,6 +267,7 @@ async function commandHandler(body) {
     })
     buffer+="/";
     console.log(buffer);
+    if (body[mode] == 5) state.collect = false;
     port.write(buffer,'utf-8',(err)=>{
         if (err) throw new Error("failed to write");
         else return 1;
