@@ -6,7 +6,6 @@ const { DelimiterParser } = require('@serialport/parser-delimiter');
 const bodyParser = require('body-parser');
 const path = require('path');
 const { stat } = require('node:fs');
-const { PassThrough } = require('node:stream');
 
 
 const ARASTAT_MODES = {
@@ -21,7 +20,7 @@ const ARASTAT_MODES = {
 
 let state = {
     running:false,
-    collect:false,
+    collect:true,
 }
 
 let expData = {
@@ -214,15 +213,15 @@ parser.on('data', function (data) {
         let a = JSON.parse(text);
         if (state.collect)
             {
+                io.emit("data",a);
                 expData.dac.push(a.dac);
                 expData.volt.push(a.volt);
                 expData.curr.push(a.curr);
-                io.emit("data",a);
             }
             else {
+                io.emit("ocp",a);
                 state.collect=true;
                 console.log(a);
-                io.emit("ocp",a);
             }
         }
     catch (Error){ }
